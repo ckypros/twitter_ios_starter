@@ -18,15 +18,32 @@ class HomeTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        loadTweets()
         tweetRefreshControl.addTarget(self, action: #selector(loadTweets), for: .valueChanged)
         tableView.refreshControl = tweetRefreshControl
+        self.tableView.rowHeight = UITableView.automaticDimension
+        self.tableView.estimatedRowHeight = 150
+    }
+    
+    @IBAction func retweet(_ sender: Any) {
+        
+    }
+    
+
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.loadTweets()
     }
     
     @objc func loadTweets() {
         numberOfTweets = 20
         getTweets()
         self.refreshControl?.endRefreshing()
+    }
+    
+    override func awakeFromNib() {
+        
+        super.awakeFromNib();
     }
     
     func getTweets() {
@@ -57,7 +74,7 @@ class HomeTableViewController: UITableViewController {
             loadMoreTweets()
         }
     }
-
+    
     @IBAction func onLogout(_ sender: Any) {
         TwitterAPICaller.client?.logout()
         UserDefaults.standard.set(false, forKey: "userLoggedIn")
@@ -77,6 +94,11 @@ class HomeTableViewController: UITableViewController {
         if let imageData = data {
             cell.profileImageView.image = UIImage(data: imageData)
         }
+        
+        cell.setFavorite((tweetArray[indexPath.row]["favorited"]) as! Bool)
+        cell.tweetId = tweetArray[indexPath.row]["id"] as! Int
+        cell.setRetweeted(tweetArray[indexPath.row]["retweeted"] as! Bool)
+        cell.selectionStyle = .none
         
         return cell
     }
